@@ -47,6 +47,19 @@ function App() {
           </button>
         </div>
       </main>
+
+      <footer className="mt-4 py-2 text-center relative z-10">
+        <div className="flex flex-col items-center gap-2">
+          {/* Línea de división */}
+          <div className="w-24 h-[1px] bg-slate-200 mb-4"></div>
+          <p className="text-slate-400 text-sm font-medium tracking-wide">
+            © {new Date().getFullYear()} <span className="text-blue-600 font-bold">Korebulary</span>
+          </p>
+          <p className="text-slate-300 text-xs">
+            Desarrollado con <span className="text-red-400">♥</span> by <a href="https://github.com/Devanna14" className="text-blue-500 hover:underline">Ceci Lara</a>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
