@@ -24,7 +24,6 @@ function App() {
     setVocabulario([...vocabulario, item]);
     setNuevaPalabra({ hangul: '', significado: '', romanizacion: '' });
     setMostrarForm(false);
-    alert("¡Palabra agregada a la sesión!");
   };
 
   return (
@@ -37,67 +36,72 @@ function App() {
           Kore<span className="text-blue-600">bulary</span>
         </h1>
         <p className="inline-block px-4 py-1 bg-white shadow-sm border border-slate-100 rounded-full text-slate-500 text-sm font-medium">
-          Tarjeta {index + 1} de {vocabulario.length}
+          {mostrarForm ? "Agregando palabra" : `Tarjeta ${index + 1} de ${vocabulario.length}`}
         </p>
       </header>
 
       <main className="relative z-10 w-full max-w-md">
-        <Flashcard key={vocabulario[index].id} card={vocabulario[index]} />
+        {!mostrarForm ? (
+          <>
+            <Flashcard key={vocabulario[index].id} card={vocabulario[index]} />
 
-        <div className="flex justify-center gap-6 mt-12 w-full">
-          <button
-            onClick={anterior}
-            className="group flex items-center justify-center w-14 h-14 bg-white text-slate-600 rounded-2xl shadow-lg hover:shadow-xl hover:bg-slate-50 transition-all active:scale-95"
-          >
-            <span className="text-2xl group-hover:-translate-x-1 transition-transform">←</span>
-          </button>
+            <div className="flex justify-center gap-6 mt-12 w-full">
+              <button
+                onClick={anterior}
+                className="group flex items-center justify-center w-14 h-14 bg-white text-slate-600 rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
+              >
+                <span className="text-2xl">←</span>
+              </button>
 
-          <button
-            onClick={siguiente}
-            className="group flex items-center justify-center px-10 h-14 bg-slate-900 text-white rounded-2xl shadow-xl hover:bg-slate-800 transition-all active:scale-95 font-bold tracking-wide"
-          >
-            Siguiente <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-          </button>
+              <button
+                onClick={siguiente}
+                className="group flex items-center justify-center px-10 h-14 bg-slate-900 text-white rounded-2xl shadow-xl hover:bg-slate-800 transition-all active:scale-95 font-bold tracking-wide"
+              >
+                Siguiente →
+              </button>
 
-          <button
-            onClick={() => setMostrarForm(!mostrarForm)}
-            className="w-14 h-14 bg-blue-600 text-white rounded-2xl shadow-lg hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center text-2xl font-bold"
-          >
-            {mostrarForm ? '×' : '+'}
-          </button>
-        </div>
-
-        {mostrarForm && (
-          <div className="mt-8 p-6 bg-white rounded-3xl shadow-2xl border border-blue-50 animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <h3 className="text-lg font-bold text-slate-800 mb-4 text-center">Nueva Tarjeta</h3>
-            <form onSubmit={agregarPalabra} className="flex flex-col gap-3">
+              <button
+                onClick={() => setMostrarForm(true)}
+                className="w-14 h-14 bg-blue-600 text-white rounded-2xl shadow-lg hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center text-2xl font-bold"
+              >
+                +
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="p-6 bg-white rounded-3xl shadow-2xl border border-blue-50 animate-in fade-in zoom-in duration-300">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-slate-800">Nueva Tarjeta</h3>
+              <button onClick={() => setMostrarForm(false)} className="text-slate-400 hover:text-slate-600 text-2xl">×</button>
+            </div>
+            <form onSubmit={agregarPalabra} className="flex flex-col gap-4">
               <input
                 type="text" placeholder="Hangul (ej: 친구)"
-                className="p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="p-4 border border-slate-100 bg-slate-50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 value={nuevaPalabra.hangul}
                 onChange={(e) => setNuevaPalabra({ ...nuevaPalabra, hangul: e.target.value })}
               />
               <input
                 type="text" placeholder="Romanización (ej: Chingu)"
-                className="p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="p-4 border border-slate-100 bg-slate-50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 value={nuevaPalabra.romanizacion}
                 onChange={(e) => setNuevaPalabra({ ...nuevaPalabra, romanizacion: e.target.value })}
               />
               <input
                 type="text" placeholder="Significado (ej: Amigo)"
-                className="p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                className="p-4 border border-slate-100 bg-slate-50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 value={nuevaPalabra.significado}
                 onChange={(e) => setNuevaPalabra({ ...nuevaPalabra, significado: e.target.value })}
               />
-              <button type="submit" className="mt-2 bg-blue-600 text-white p-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all">
-                Guardar Palabra
+              <button type="submit" className="mt-4 bg-blue-600 text-white p-4 rounded-2xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95">
+                Guardar
               </button>
             </form>
           </div>
         )}
       </main>
 
-      <footer className="mt-4 py-2 text-center relative z-10">
+      <footer className="mt-8 py-2 text-center relative z-10">
         <div className="flex flex-col items-center gap-2">
           <div className="w-24 h-[1px] bg-slate-200 mb-4"></div>
           <p className="text-slate-400 text-sm font-medium tracking-wide">
