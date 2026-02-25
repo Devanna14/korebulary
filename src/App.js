@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { vocabularioCoreano } from './data';
-import Flashcard from './Flashcard';
+import { vocabularioCoreano } from './data/data';
+import Flashcard from './cards/Flashcard';
 
 function App() {
   const [index, setIndex] = useState(0);
