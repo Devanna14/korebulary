@@ -125,25 +125,26 @@ function App() {
 
     try {
       const reporteRef = doc(db, "reportes", idReporte);
+      //COMENTADO POR ERROR DE LECTURA EN USUARIOS GENERALES, SE DEBE VERIFICAR SI EL REPORTE EXISTE PARA EVITAR DUPLICADOS, PERO ESTÁ GENERANDO UN ERROR DE LECTURA EN FIREBASE QUE NO PERMITE ENVIAR REPORTES NUEVOS
       // Verificamos si el reporte ya existe en la base de datos
-      const docSnap = await getDoc(reporteRef);
-      if (docSnap.exists()) {
-        alert(
-          `La palabra "${hangulLimpio}" ya tiene un reporte activo y está siendo revisada. ¡Gracias por tu paciencia!`,
-        );
+      // const docSnap = await getDoc(reporteRef);
+      // if (docSnap.exists()) {
+      //   alert(
+      //     `La palabra "${hangulLimpio}" ya tiene un reporte activo y está siendo revisada. ¡Gracias por tu paciencia!`,
+      //   );
 
-        setReporte({
-          hangul: "",
-          comentario: "",
-          fecha: null,
-          estado: "pendiente",
-          correo: "",
-          userAgent: "",
-        });
-        setMostrarFormReporte(false);
-        setMostrarMenu(false);
-        return;
-      }
+      //   setReporte({
+      //     hangul: "",
+      //     comentario: "",
+      //     fecha: null,
+      //     estado: "pendiente",
+      //     correo: "",
+      //     userAgent: "",
+      //   });
+      //   setMostrarFormReporte(false);
+      //   setMostrarMenu(false);
+      //   return;
+      // }
 
       // Si no existe, se crearlo
       await setDoc(reporteRef, {
