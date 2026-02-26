@@ -15,13 +15,14 @@ function App() {
   // const [vocabulario, setVocabulario] = useState(vocabularioCoreano); // Inicializamos con datos locales para pruebas, luego se actualizará con Firebase
   const [vocabulario, setVocabulario] = useState([]); // Inicializamos vacío, luego se llenará con Firebase
   const [index, setIndex] = useState(0);
-  const [mostrarForm, setMostrarForm] = useState(false);
   const [nuevaPalabra, setNuevaPalabra] = useState({
     hangul: "",
     significado: "",
     romanizacion: "",
   });
   const [cargando, setCargando] = useState(true); // Estado para manejar la carga de datos
+  const [mostrarForm, setMostrarForm] = useState(false);
+  const [mostrarMenu, setMostrarMenu] = useState(false); 
 
   // 1. Datos de Firebase en tiempo real
   useEffect(() => {
