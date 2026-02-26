@@ -125,7 +125,7 @@ function App() {
       await setDoc(reporteRef, {
         ...reporte,
         fecha: new Date(),
-        correo: "",
+        correo: reporte.correo.trim(),
         hangul: reporte.hangul.trim(),
         estado: "pendiente",
         userAgent: navigator.userAgent,
@@ -229,7 +229,7 @@ function App() {
       {/* MODAL DEL MENÚ / REPORTE */}
       {mostrarMenu && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-sm bg-white rounded-[2.5rem] p-8 shadow-2xl relative">
+          <div className="w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl relative">
             <button
               onClick={() => {
                 setMostrarMenu(false);
@@ -258,6 +258,12 @@ function App() {
                   >
                     <span>📧</span> Contacto
                   </a>
+                  <button
+                    onClick={() => setMostrarFormReporte(true)}
+                    className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-yellow-50 text-slate-600 hover:text-yellow-600 rounded-2xl transition-colors font-medium text-left"
+                  >
+                    <span>💡</span> Sugerencias
+                  </button>
                   <button
                     onClick={() => alert("¡Gracias!")}
                     className="flex items-center gap-4 p-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg"
@@ -296,6 +302,15 @@ function App() {
                     setReporte({ ...reporte, comentario: e.target.value })
                   }
                   required
+                />
+                <input
+                  type="email"
+                  placeholder="tucorreo@ejemplo.com para seguimiento"
+                  className="p-4 border border-slate-100 bg-slate-50 rounded-2xl focus:ring-2 focus:ring-red-400 outline-none"
+                  value={reporte.correo}
+                  onChange={(e) =>
+                    setReporte({ ...reporte, correo: e.target.value })
+                  }
                 />
                 <button
                   type="submit"
