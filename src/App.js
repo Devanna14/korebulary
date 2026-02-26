@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"; //Uso de useEffect para traer los datos de firebase
-// import { vocabularioCoreano } from "./data/data";
+import { opcionesApoyo } from "./data/data"; // Importamos las opciones de apoyo para mostrar en el menú
 import Flashcard from "./cards/Flashcard";
 import AdminPanel from "./Panel/AdminPanel";
 import { db } from "./firebaseConfig"; // Importamos la db firebase
@@ -34,6 +34,8 @@ function App() {
   const [mostrarForm, setMostrarForm] = useState(false);
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const [mostrarFormReporte, setMostrarFormReporte] = useState(false); // Nuevo estado para mostrar el formulario de reporte
+
+  const [mostrarApoyo, setMostrarApoyo] = useState(false);
 
   const [reporte, setReporte] = useState({
     hangul: "",
@@ -297,50 +299,20 @@ function App() {
       {/* MODAL DEL MENÚ / REPORTE */}
       {mostrarMenu && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl relative">
+          <div className="w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-y-auto max-h-[90vh]">
             <button
               onClick={() => {
                 setMostrarMenu(false);
                 setMostrarFormReporte(false);
+                setMostrarApoyo(false);
               }}
               className="absolute top-6 right-6 text-slate-300 hover:text-slate-500 text-3xl"
             >
               ×
             </button>
 
-            {!mostrarFormReporte ? (
-              <>
-                <h2 className="text-2xl font-bold text-slate-800 mb-6">
-                  Opciones
-                </h2>
-                <div className="flex flex-col gap-3">
-                  <button
-                    onClick={() => setMostrarFormReporte(true)}
-                    className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-red-50 text-slate-600 hover:text-red-600 rounded-2xl transition-colors font-medium text-left"
-                  >
-                    <span>🚩</span> Reportar palabra
-                  </button>
-                  <a
-                    href="mailto:cecylar14@gmail.com"
-                    className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-2xl transition-colors font-medium"
-                  >
-                    <span>📧</span> Contacto
-                  </a>
-                  <button
-                    onClick={() => setMostrarFormReporte(true)}
-                    className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-yellow-50 text-slate-600 hover:text-yellow-600 rounded-2xl transition-colors font-medium text-left"
-                  >
-                    <span>💡</span> Sugerencias
-                  </button>
-                  <button
-                    onClick={() => alert("¡Gracias!")}
-                    className="flex items-center gap-4 p-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg"
-                  >
-                    <span>☕</span> Apoyar proyecto
-                  </button>
-                </div>
-              </>
-            ) : (
+            {/* 1. PRIORIDAD: VISTA DE REPORTE */}
+            {mostrarFormReporte ? (
               <form
                 onSubmit={enviarReporte}
                 className="flex flex-col gap-4 animate-in slide-in-from-right-4 duration-300"
@@ -394,43 +366,123 @@ function App() {
                   Volver
                 </button>
               </form>
-            )}
-
-            <div className="border-t border-slate-100 mt-4 pt-4">
-              {!usuarioAdmin ? (
-                <button
-                  onClick={loginConGoogle}
-                  className="flex items-center justify-center gap-3 w-full p-3 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-all active:scale-95 text-sm font-medium text-slate-600"
-                >
+            ) : /* 2. SEGUNDA PRIORIDAD: VISTA DE APOYO */
+            mostrarApoyo ? (
+              <div className="animate-in slide-in-from-right duration-300">
+                <div className="text-center mb-6">
                   <img
-                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                    alt="Google"
-                    className="w-5 h-5"
+                    src={`${process.env.PUBLIC_URL}/img-apoyo.png`}
+                    alt="Apoya el proyecto"
+                    className="w-32 h-32 mx-auto rounded-full mb-4 shadow-md object-cover"
                   />
-                  Acceso Admin con Google
-                </button>
-              ) : (
+                  <h2 className="text-2xl font-bold text-slate-800">
+                    Apoyar Proyecto
+                  </h2>
+                  <p className="text-blue-600 font-medium text-sm">
+                    Korebulary
+                  </p>
+                </div>
+
+                <p className="text-sm text-slate-600 leading-relaxed mb-6 text-center">
+                  안녕하세요! Soy Ceci. Mi meta es mantener esta herramienta
+                  <strong> gratuita y libre de anuncios</strong>. Tu
+                  contribución me ayuda a pagar los servidores y seguir
+                  mejorando la app para todos. ¡Cualquier apoyo significa mucho!
+                </p>
+
                 <div className="flex flex-col gap-3">
-                  {usuarioAdmin && (
-                    <button
-                      onClick={() => {
-                        setVerReportes(true);
-                        setMostrarMenu(false);
-                      }}
-                      className="p-3 bg-green-50 text-green-700 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
+                  {opcionesApoyo.map((opcion) => (
+                    <a
+                      key={opcion.id}
+                      href={opcion.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex justify-between items-center p-4 bg-blue-50 hover:bg-blue-100 rounded-2xl transition-all border border-blue-100 group active:scale-95"
                     >
-                      📊 Ver Reportes Pendientes
-                    </button>
-                  )}
+                      <div className="flex flex-col">
+                        <span className="font-bold text-blue-900">
+                          {opcion.titulo}
+                        </span>
+                        <span className="text-xs text-blue-400">
+                          Pago seguro
+                        </span>
+                      </div>
+                      <span className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm group-hover:bg-blue-700 transition-colors">
+                        {opcion.costo}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              /* 3. VISTA POR DEFECTO: MENÚ DE OPCIONES */
+              <>
+                <h2 className="text-2xl font-bold text-slate-800 mb-6">
+                  Opciones
+                </h2>
+                <div className="flex flex-col gap-3">
                   <button
-                    onClick={manejarLogout}
-                    className="text-xs text-red-400 hover:text-red-600 font-medium text-center"
+                    onClick={() => setMostrarFormReporte(true)}
+                    className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-red-50 text-slate-600 hover:text-red-600 rounded-2xl transition-colors font-medium text-left"
                   >
-                    Cerrar Sesión
+                    <span>🚩</span> Reportar palabra
+                  </button>
+                  <a
+                    href="mailto:cecylar14@gmail.com"
+                    className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-2xl transition-colors font-medium"
+                  >
+                    <span>📧</span> Contacto
+                  </a>
+                  <button
+                    onClick={() => alert("¡Gracias!")} // O tu botón de sugerencias
+                    className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-yellow-50 text-slate-600 hover:text-yellow-600 rounded-2xl transition-colors font-medium text-left"
+                  >
+                    <span>💡</span> Sugerencias
+                  </button>
+                  <button
+                    onClick={() => setMostrarApoyo(true)}
+                    className="flex items-center gap-4 p-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-transform"
+                  >
+                    <span>☕</span> Apoyar proyecto
                   </button>
                 </div>
-              )}
-            </div>
+
+                {/* Sección de Login al final (Opcional, la puedes mantener aquí) */}
+                <div className="border-t border-slate-100 mt-4 pt-4 text-center">
+                  {!usuarioAdmin ? (
+                    <button
+                      onClick={loginConGoogle}
+                      className="flex items-center justify-center gap-3 w-full p-3 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-all active:scale-95 text-sm font-medium text-slate-600"
+                    >
+                      <img
+                        src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                        alt="Google"
+                        className="w-5 h-5"
+                      />
+                      Acceso Admin con Google
+                    </button>
+                  ) : (
+                    <div className="flex flex-col gap-3">
+                      <button
+                        onClick={() => {
+                          setVerReportes(true);
+                          setMostrarMenu(false);
+                        }}
+                        className="p-3 bg-green-50 text-green-700 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-green-100 transition-colors"
+                      >
+                        📊 Ver Reportes Pendientes
+                      </button>
+                      <button
+                        onClick={manejarLogout}
+                        className="text-xs text-red-400 hover:text-red-600 font-medium text-center p-2"
+                      >
+                        Cerrar Sesión
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

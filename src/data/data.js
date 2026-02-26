@@ -7,3 +7,12 @@ export const vocabularioCoreano = [
   { id: 5, hangul: "사랑해", romanizacion: "Sarangne", significado: "Te amo" },
   { id: 6, hangul: "바보", romanizacion: "Pavo", significado: "Tonto" },
 ];
+
+// Opciones de apoyo para los usuarios que quieran contribuir al proyecto.
+export const opcionesApoyo = [
+  { id: 1, titulo: "☕ Invítame un café", costo: "$65", link: "TU_LINK_DE_PAGO_1" },
+  { id: 2, titulo: "🍳 Un desayuno", costo: "$100", link: "TU_LINK_DE_PAGO_2" },
+  { id: 3, titulo: "🚀 Sostener la App", costo: "$150", link: "TU_LINK_DE_PAGO_3" },
+];
+
+export const imagenApoyo = "img-apoyo.png";
