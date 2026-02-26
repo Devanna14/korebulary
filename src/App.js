@@ -9,6 +9,7 @@ import {
   collection,
   onSnapshot,
   query,
+  addDoc, // Importamos las funciones necesarias de Firestore para los reportes
 } from "firebase/firestore";
 
 function App() {
@@ -23,6 +24,14 @@ function App() {
   const [cargando, setCargando] = useState(true); // Estado para manejar la carga de datos
   const [mostrarForm, setMostrarForm] = useState(false);
   const [mostrarMenu, setMostrarMenu] = useState(false);
+  const [mostrarFormReporte, setMostrarFormReporte] = useState(false); // Nuevo estado para mostrar el formulario de reporte
+
+  const [reporte, setReporte] = useState({
+    hangul: "",
+    comentario: "",
+    fecha: null,
+    estado: "pendiente", // Pendiente, en revisión, resuelto
+  });
 
   // 1. Datos de Firebase en tiempo real
   useEffect(() => {
@@ -81,6 +90,67 @@ function App() {
     } catch (error) {
       console.error("Error en la operación:", error);
       alert("Hubo un error al intentar guardar.");
+    }
+  };
+
+  // Función para enviar el reporte a Firebase
+  const enviarReporte = async (e) => {
+    e.preventDefault();
+    if (!reporte.hangul || !reporte.comentario) return;
+    const idReporte = reporte.hangul.trim().toLowerCase();
+
+    try {
+      const reporteRef = doc(db, "reportes", idReporte);
+      // Verificamos si el reporte ya existe en la base de datos
+      const docSnap = await getDoc(reporteRef);
+      if (docSnap.exists()) {
+        alert(
+          `La palabra "${reporte.hangul}" ya tiene un reporte activo y está siendo revisada. ¡Gracias por tu paciencia!`,
+        );
+
+        setReporte({
+          hangul: "",
+          comentario: "",
+          fecha: null,
+          estado: "pendiente",
+          correo: "",
+          userAgent: "",
+        });
+        setMostrarFormReporte(false);
+        setMostrarMenu(false);
+        return;
+      }
+
+      // Si no existe, se crearlo
+      await setDoc(reporteRef, {
+        ...reporte,
+        fecha: new Date(),
+        correo: "",
+        hangul: reporte.hangul.trim(),
+        estado: "pendiente",
+        userAgent: navigator.userAgent,
+        comentario: reporte.comentario.trim(),
+      });
+
+      alert(
+        "Reporte enviado con éxito. Revisaré la palabra '" +
+          reporte.hangul +
+          "' pronto.",
+      );
+
+      setReporte({
+        hangul: "",
+        comentario: "",
+        fecha: null,
+        estado: "pendiente",
+        correo: "",
+        userAgent: "",
+      });
+      setMostrarFormReporte(false);
+      setMostrarMenu(false);
+    } catch (error) {
+      console.error("Error al enviar reporte:", error);
+      alert("Hubo un problema al enviar el reporte. Inténtalo de nuevo.");
     }
   };
 
@@ -156,42 +226,92 @@ function App() {
         <span className="text-2xl">⚙️</span>
       </button>
 
-      {/* MODAL DEL MENÚ */}
+      {/* MODAL DEL MENÚ / REPORTE */}
       {mostrarMenu && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-sm bg-white rounded-[2.5rem] p-8 shadow-2xl relative">
             <button
-              onClick={() => setMostrarMenu(false)}
+              onClick={() => {
+                setMostrarMenu(false);
+                setMostrarFormReporte(false);
+              }}
               className="absolute top-6 right-6 text-slate-300 hover:text-slate-500 text-3xl"
             >
               ×
             </button>
 
-            <h2 className="text-2xl font-bold text-slate-800 mb-6">Opciones</h2>
-
-            <div className="flex flex-col gap-3">
-              <button className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-red-50 text-slate-600 hover:text-red-600 rounded-2xl transition-colors font-medium">
-                <span>🚩</span> Reportar palabra
-              </button>
-
-              <a
-                href="mailto:cecilara14@gmail.com"
-                className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-2xl transition-colors font-medium"
+            {!mostrarFormReporte ? (
+              <>
+                <h2 className="text-2xl font-bold text-slate-800 mb-6">
+                  Opciones
+                </h2>
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={() => setMostrarFormReporte(true)}
+                    className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-red-50 text-slate-600 hover:text-red-600 rounded-2xl transition-colors font-medium text-left"
+                  >
+                    <span>🚩</span> Reportar palabra
+                  </button>
+                  <a
+                    href="mailto:cecylar14@gmail.com"
+                    className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-2xl transition-colors font-medium"
+                  >
+                    <span>📧</span> Contacto
+                  </a>
+                  <button
+                    onClick={() => alert("¡Gracias!")}
+                    className="flex items-center gap-4 p-4 bg-blue-600 text-white rounded-2xl font-bold shadow-lg"
+                  >
+                    <span>☕</span> Apoyar proyecto
+                  </button>
+                </div>
+              </>
+            ) : (
+              <form
+                onSubmit={enviarReporte}
+                className="flex flex-col gap-4 animate-in slide-in-from-right-4 duration-300"
               >
-                <span>📧</span> Contacto
-              </a>
-
-              <button
-                onClick={() =>
-                  alert(
-                    "¡Gracias por tu apoyo! Próximamente habilitaremos PayPal/Ko-fi.",
-                  )
-                }
-                className="flex items-center gap-4 p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl transition-all font-bold shadow-lg shadow-blue-100"
-              >
-                <span>☕</span> Apoyar el proyecto
-              </button>
-            </div>
+                <h2 className="text-2xl font-bold text-slate-800 mb-2">
+                  Reportar error
+                </h2>
+                <p className="text-sm text-slate-500 mb-2">
+                  Dime qué palabra está mal y por qué.
+                </p>
+                <input
+                  type="text"
+                  placeholder="Hangul de la palabra"
+                  className="p-4 border border-slate-100 bg-slate-50 rounded-2xl focus:ring-2 focus:ring-red-400 outline-none"
+                  value={reporte.hangul}
+                  onChange={(e) =>
+                    setReporte({ ...reporte, hangul: e.target.value })
+                  }
+                  required
+                />
+                <textarea
+                  placeholder="¿Cuál es el error? (ej: Significado incorrecto)"
+                  rows="3"
+                  className="p-4 border border-slate-100 bg-slate-50 rounded-2xl focus:ring-2 focus:ring-red-400 outline-none resize-none"
+                  value={reporte.comentario}
+                  onChange={(e) =>
+                    setReporte({ ...reporte, comentario: e.target.value })
+                  }
+                  required
+                />
+                <button
+                  type="submit"
+                  className="bg-red-500 text-white p-4 rounded-2xl font-bold hover:bg-red-600 transition-all shadow-lg shadow-red-100"
+                >
+                  Enviar Reporte
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMostrarFormReporte(false)}
+                  className="text-slate-400 text-sm font-medium"
+                >
+                  Volver
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}
