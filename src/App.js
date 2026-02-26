@@ -11,6 +11,13 @@ import {
   query,
   addDoc, // Importamos las funciones necesarias de Firestore para los reportes
 } from "firebase/firestore";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  onAuthStateChanged,
+} from "firebase/auth"; // Importamos funciones de autenticación para manejar usuario administrador
 
 function App() {
   // const [vocabulario, setVocabulario] = useState(vocabularioCoreano); // Inicializamos con datos locales para pruebas, luego se actualizará con Firebase
@@ -32,6 +39,10 @@ function App() {
     fecha: null,
     estado: "pendiente", // Pendiente, en revisión, resuelto
   });
+
+  const auth = getAuth();
+  const provider = new GoogleAuthProvider();
+  const [usuarioAdmin, setUsuarioAdmin] = useState(null);
 
   // 1. Datos de Firebase en tiempo real
   useEffect(() => {
@@ -151,6 +162,30 @@ function App() {
     } catch (error) {
       console.error("Error al enviar reporte:", error);
       alert("Hubo un problema al enviar el reporte. Inténtalo de nuevo.");
+    }
+  };
+
+  // Sesion administrador con Google
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user && user.email === process.env.REACT_APP_ADMIN_EMAIL) {
+        setUsuarioAdmin(user);
+      } else if (user) {
+        // Si entra alguien más con Google, lo deslogueamos o limitamos
+        console.log("Acceso denegado: No es administrador");
+        signOut(auth);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // 2. Función para iniciar sesión con la ventana de Google
+  const loginConGoogle = async () => {
+    try {
+      await signInWithPopup(auth, provider);
+      setMostrarMenu(false);
+    } catch (error) {
+      console.error("Error al autenticar con Google:", error);
     }
   };
 
@@ -327,6 +362,47 @@ function App() {
                 </button>
               </form>
             )}
+
+            <div className="border-t border-slate-100 mt-4 pt-4">
+              {!usuarioAdmin ? (
+                <button
+                  onClick={loginConGoogle}
+                  className="flex items-center justify-center gap-3 w-full p-3 border border-slate-200 rounded-2xl hover:bg-slate-50 transition-all active:scale-95 text-sm font-medium text-slate-600"
+                >
+                  <img
+                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                    alt="Google"
+                    className="w-5 h-5"
+                  />
+                  Acceso Admin con Google
+                </button>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <img
+                      src={usuarioAdmin.photoURL}
+                      alt="Admin"
+                      className="w-8 h-8 rounded-full border border-blue-200"
+                    />
+                    <span className="text-xs font-bold text-slate-700">
+                      Hola, Admin
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => alert("Mostrando lista de reportes...")}
+                    className="p-3 bg-green-50 text-green-700 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
+                  >
+                    📊 Ver Reportes Pendientes
+                  </button>
+                  <button
+                    onClick={() => signOut(auth)}
+                    className="text-xs text-red-400 hover:text-red-600 font-medium text-center"
+                  >
+                    Cerrar Sesión
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

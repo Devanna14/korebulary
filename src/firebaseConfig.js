@@ -2,9 +2,9 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 const firebaseConfig = {
-  apiKey: "AIzaSyCQxWeetb3EOORG9aRGc7hQTHGhlMWpLlU",
-  authDomain: "korebulary.firebaseapp.com",
-  projectId: "korebulary",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
   storageBucket: "korebulary.firebasestorage.app",
   messagingSenderId: "367379768598",
   appId: "1:367379768598:web:2009f72ac2801c42955c37",
