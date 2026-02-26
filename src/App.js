@@ -2,7 +2,14 @@ import { useState, useEffect } from "react"; //Uso de useEffect para traer los d
 import { vocabularioCoreano } from "./data/data";
 import Flashcard from "./cards/Flashcard";
 import { db } from "./firebaseConfig"; // Importamos la db firebase
-import { collection, addDoc, onSnapshot, query } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  onSnapshot,
+  query,
+} from "firebase/firestore";
 
 function App() {
   // const [vocabulario, setVocabulario] = useState(vocabularioCoreano); // Inicializamos con datos locales para pruebas, luego se actualizará con Firebase
@@ -39,22 +46,44 @@ function App() {
   // 2. Guardar en Firebase
   const agregarPalabra = async (e) => {
     e.preventDefault();
+
     if (!nuevaPalabra.hangul || !nuevaPalabra.significado) return;
 
+    // Normalizamos el ID para evitar duplicados por mayúsculas, espacios, etc.
+    const idDocumento = nuevaPalabra.hangul.trim().toLowerCase();
+
     try {
-      await addDoc(collection(db, "vocabulario"), {
+      // Referencia al documento usando el Hangul como ID
+      const docRef = doc(db, "vocabulario", idDocumento);
+
+      // Se obtiene el documento para ver si existe
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        alert(
+          `La palabra "${nuevaPalabra.hangul}" ya fue registrada por alguien más.`,
+        );
+        return;
+      }
+
+      // Si no existe se guarda usando setDoc en lugar de addDoc que era mas para colecciones y genera un ID automático
+      await setDoc(docRef, {
         ...nuevaPalabra,
+        hangul: nuevaPalabra.hangul.trim(),
         createdAt: new Date(),
       });
+
       setNuevaPalabra({ hangul: "", significado: "", romanizacion: "" });
       setMostrarForm(false);
     } catch (error) {
-      console.error("Error al guardar:", error);
+      console.error("Error en la operación:", error);
+      alert("Hubo un error al intentar guardar.");
     }
   };
 
   // Validación de que haya datos antes de renderizar la Flashcard
-  if (vocabulario.length === 0) return <p className="text-center mt-10">Cargando vocabulario...</p>;
+  if (vocabulario.length === 0)
+    return <p className="text-center mt-10">Cargando vocabulario...</p>;
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-6 relative overflow-hidden">
