@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"; //Uso de useEffect para traer los datos de firebase
-import { vocabularioCoreano } from "./data/data";
+// import { vocabularioCoreano } from "./data/data";
 import Flashcard from "./cards/Flashcard";
+import AdminPanel from "./Panel/AdminPanel";
 import { db } from "./firebaseConfig"; // Importamos la db firebase
 import {
   doc,
@@ -20,6 +21,7 @@ import {
 } from "firebase/auth"; // Importamos funciones de autenticación para manejar usuario administrador
 
 function App() {
+  const [verReportes, setVerReportes] = useState(false);
   // const [vocabulario, setVocabulario] = useState(vocabularioCoreano); // Inicializamos con datos locales para pruebas, luego se actualizará con Firebase
   const [vocabulario, setVocabulario] = useState([]); // Inicializamos vacío, luego se llenará con Firebase
   const [index, setIndex] = useState(0);
@@ -70,10 +72,14 @@ function App() {
   const agregarPalabra = async (e) => {
     e.preventDefault();
 
-    if (!nuevaPalabra.hangul || !nuevaPalabra.significado) return;
+    const hangulLimpio = limpiarTexto(nuevaPalabra.hangul);
+    const significadoLimpio = limpiarTexto(nuevaPalabra.significado);
+    const romanizacionLimpia = limpiarTexto(nuevaPalabra.romanizacion);
+
+    if (!hangulLimpio || !significadoLimpio) return;
 
     // Normalizamos el ID para evitar duplicados por mayúsculas, espacios, etc.
-    const idDocumento = nuevaPalabra.hangul.trim().toLowerCase();
+    const idDocumento = hangulLimpio.toLowerCase();
 
     try {
       // Referencia al documento usando el Hangul como ID
@@ -84,7 +90,7 @@ function App() {
 
       if (docSnap.exists()) {
         alert(
-          `La palabra "${nuevaPalabra.hangul}" ya fue registrada por alguien más.`,
+          `La palabra "${hangulLimpio.hangul}" ya fue registrada por alguien más.`,
         );
         return;
       }
@@ -92,7 +98,9 @@ function App() {
       // Si no existe se guarda usando setDoc en lugar de addDoc que era mas para colecciones y genera un ID automático
       await setDoc(docRef, {
         ...nuevaPalabra,
-        hangul: nuevaPalabra.hangul.trim(),
+        hangul: hangulLimpio,
+        significado: significadoLimpio,
+        romanizacion: romanizacionLimpia,
         createdAt: new Date(),
       });
 
@@ -107,8 +115,13 @@ function App() {
   // Función para enviar el reporte a Firebase
   const enviarReporte = async (e) => {
     e.preventDefault();
-    if (!reporte.hangul || !reporte.comentario) return;
-    const idReporte = reporte.hangul.trim().toLowerCase();
+
+    const hangulLimpio = limpiarTexto(reporte.hangul);
+    const comentarioLimpio = limpiarTexto(reporte.comentario);
+    const correoLimpio = reporte.correo.trim().toLowerCase();
+
+    if (!hangulLimpio || !comentarioLimpio) return;
+    const idReporte = hangulLimpio.toLowerCase();
 
     try {
       const reporteRef = doc(db, "reportes", idReporte);
@@ -116,7 +129,7 @@ function App() {
       const docSnap = await getDoc(reporteRef);
       if (docSnap.exists()) {
         alert(
-          `La palabra "${reporte.hangul}" ya tiene un reporte activo y está siendo revisada. ¡Gracias por tu paciencia!`,
+          `La palabra "${hangulLimpio}" ya tiene un reporte activo y está siendo revisada. ¡Gracias por tu paciencia!`,
         );
 
         setReporte({
@@ -136,16 +149,16 @@ function App() {
       await setDoc(reporteRef, {
         ...reporte,
         fecha: new Date(),
-        correo: reporte.correo.trim(),
-        hangul: reporte.hangul.trim(),
+        correo: correoLimpio,
+        hangul: hangulLimpio,
         estado: "pendiente",
         userAgent: navigator.userAgent,
-        comentario: reporte.comentario.trim(),
+        comentario: comentarioLimpio,
       });
 
       alert(
         "Reporte enviado con éxito. Revisaré la palabra '" +
-          reporte.hangul +
+          hangulLimpio +
           "' pronto.",
       );
 
@@ -187,6 +200,25 @@ function App() {
     } catch (error) {
       console.error("Error al autenticar con Google:", error);
     }
+  };
+
+  const manejarLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.warn(
+        "La petición de cierre de sesión fue bloqueada o falló:",
+        error,
+      );
+    } finally {
+      setUsuarioAdmin(null);
+      setVerReportes(false);
+      setMostrarMenu(false);
+    }
+  };
+
+  const limpiarTexto = (texto) => {
+    return texto.trim().replace(/[<>]/g, "").slice(0, 100);
   };
 
   // Validación de que haya datos antes de renderizar la Flashcard
@@ -378,24 +410,19 @@ function App() {
                 </button>
               ) : (
                 <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2 mb-2">
-                    <img
-                      src={usuarioAdmin.photoURL}
-                      alt="Admin"
-                      className="w-8 h-8 rounded-full border border-blue-200"
-                    />
-                    <span className="text-xs font-bold text-slate-700">
-                      Hola, Admin
-                    </span>
-                  </div>
+                  {usuarioAdmin && (
+                    <button
+                      onClick={() => {
+                        setVerReportes(true);
+                        setMostrarMenu(false);
+                      }}
+                      className="p-3 bg-green-50 text-green-700 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
+                    >
+                      📊 Ver Reportes Pendientes
+                    </button>
+                  )}
                   <button
-                    onClick={() => alert("Mostrando lista de reportes...")}
-                    className="p-3 bg-green-50 text-green-700 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
-                  >
-                    📊 Ver Reportes Pendientes
-                  </button>
-                  <button
-                    onClick={() => signOut(auth)}
+                    onClick={manejarLogout}
                     className="text-xs text-red-400 hover:text-red-600 font-medium text-center"
                   >
                     Cerrar Sesión
@@ -473,6 +500,7 @@ function App() {
           </p>
         </div>
       </footer>
+      {verReportes && <AdminPanel alCerrar={() => setVerReportes(false)} />}
     </div>
   );
 
