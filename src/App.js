@@ -22,7 +22,7 @@ function App() {
   });
   const [cargando, setCargando] = useState(true); // Estado para manejar la carga de datos
   const [mostrarForm, setMostrarForm] = useState(false);
-  const [mostrarMenu, setMostrarMenu] = useState(false); 
+  const [mostrarMenu, setMostrarMenu] = useState(false);
 
   // 1. Datos de Firebase en tiempo real
   useEffect(() => {
@@ -148,6 +148,54 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Botón de Engrane */}
+      <button
+        onClick={() => setMostrarMenu(true)}
+        className="absolute top-6 right-6 z-50 p-3 bg-white rounded-full shadow-md hover:shadow-lg transition-all text-slate-400 hover:text-blue-600 active:scale-90"
+      >
+        <span className="text-2xl">⚙️</span>
+      </button>
+
+      {/* MODAL DEL MENÚ */}
+      {mostrarMenu && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-sm bg-white rounded-[2.5rem] p-8 shadow-2xl relative">
+            <button
+              onClick={() => setMostrarMenu(false)}
+              className="absolute top-6 right-6 text-slate-300 hover:text-slate-500 text-3xl"
+            >
+              ×
+            </button>
+
+            <h2 className="text-2xl font-bold text-slate-800 mb-6">Opciones</h2>
+
+            <div className="flex flex-col gap-3">
+              <button className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-red-50 text-slate-600 hover:text-red-600 rounded-2xl transition-colors font-medium">
+                <span>🚩</span> Reportar palabra
+              </button>
+
+              <a
+                href="mailto:cecilara14@gmail.com"
+                className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-2xl transition-colors font-medium"
+              >
+                <span>📧</span> Contacto
+              </a>
+
+              <button
+                onClick={() =>
+                  alert(
+                    "¡Gracias por tu apoyo! Próximamente habilitaremos PayPal/Ko-fi.",
+                  )
+                }
+                className="flex items-center gap-4 p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl transition-all font-bold shadow-lg shadow-blue-100"
+              >
+                <span>☕</span> Apoyar el proyecto
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Fondos Decorativos */}
       <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-100 rounded-full blur-3xl opacity-50"></div>
