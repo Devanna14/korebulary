@@ -224,6 +224,31 @@ function App() {
     return texto.trim().replace(/[<>]/g, "").slice(0, 100);
   };
 
+  const hablarCoreano = (texto) => {
+    if (!texto) return;
+
+    // Cancelar audios previos
+    window.speechSynthesis.cancel();
+
+    const enunciado = new SpeechSynthesisUtterance(texto);
+
+    // Intentar encontrar una voz coreana específica en el sistema
+    const voces = window.speechSynthesis.getVoices();
+    const vozCoreana = voces.find(
+      (v) => v.lang === "ko-KR" || v.lang.includes("ko"),
+    );
+
+    if (vozCoreana) {
+      enunciado.voice = vozCoreana;
+    }
+
+    enunciado.lang = "ko-KR";
+    enunciado.rate = 0.8;
+    enunciado.volume = 1; // Aseguramos volumen al máximo
+
+    window.speechSynthesis.speak(enunciado);
+  };
+
   // Validación de que haya datos antes de renderizar la Flashcard
   if (cargando) {
     return (
@@ -510,7 +535,11 @@ function App() {
           FormularioRegistro
         ) : (
           <>
-            <Flashcard key={vocabulario[index].id} card={vocabulario[index]} />
+            <Flashcard
+              key={vocabulario[index].id}
+              card={vocabulario[index]}
+              alEscuchar={() => hablarCoreano(vocabulario[index].hangul)}
+            />
             <div className="flex justify-center gap-6 mt-12 w-full">
               <button
                 onClick={anterior}

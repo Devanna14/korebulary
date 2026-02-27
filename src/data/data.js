@@ -10,9 +10,9 @@ export const vocabularioCoreano = [
 
 // Opciones de apoyo para los usuarios que quieran contribuir al proyecto.
 export const opcionesApoyo = [
-  { id: 1, titulo: "☕ Invítame un café", costo: "$65", link: "TU_LINK_DE_PAGO_1" },
-  { id: 2, titulo: "🍳 Un desayuno", costo: "$100", link: "TU_LINK_DE_PAGO_2" },
-  { id: 3, titulo: "🚀 Sostener la App", costo: "$150", link: "TU_LINK_DE_PAGO_3" },
+  { id: 1, titulo: "☕ Invítame un café", costo: "$65", link: process.env.REACT_APP_APOYO_65 },
+  { id: 2, titulo: "🍳 Un desayuno", costo: "$100", link: process.env.REACT_APP_APOYO_100 },
+  { id: 3, titulo: "🚀 Sostener la App", costo: "$150", link: process.env.REACT_APP_APOYO_150 },
 ];
 
 export const imagenApoyo = "img-apoyo.png";
