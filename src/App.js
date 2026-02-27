@@ -45,12 +45,22 @@ function App() {
     estado: "pendiente", // Pendiente, en revisión, resuelto
   });
 
+  // Configuración de autenticación con Google
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
   const [usuarioAdmin, setUsuarioAdmin] = useState(null);
 
+  // Estado para manejar el envío de sugerencias
   const [sugerenciaTexto, setSugerenciaTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
+
+  // Estado para manejar el modal después de enviar un reporte o sugerencia etc alerta general
+  const [modalConfig, setModalConfig] = useState({
+    visible: false,
+    titulo: "",
+    mensaje: "",
+    tipo: "exito",
+  });
 
   // 1. Datos de Firebase en tiempo real
   useEffect(() => {
@@ -163,11 +173,14 @@ function App() {
         comentario: comentarioLimpio,
       });
 
-      alert(
-        "Reporte enviado con éxito. Revisaré la palabra '" +
-          hangulLimpio +
-          "' pronto.",
-      );
+      setModalConfig({
+        visible: true,
+        titulo: "¡Recibido!",
+        mensaje:
+          "Reporte enviado con éxito. Revisaré la palabra '" +
+          hangulLimpio + "' pronto. ¡Gracias por ayudarme a mejorar Korebulary! ❤️",
+        tipo: "exito",
+      });
 
       setReporte({
         hangul: "",
@@ -181,7 +194,13 @@ function App() {
       setMostrarMenu(false);
     } catch (error) {
       console.error("Error al enviar reporte:", error);
-      alert("Hubo un problema al enviar el reporte. Inténtalo de nuevo.");
+      setModalConfig({
+        visible: true,
+        titulo: "¡Error!",
+        mensaje:
+          "Hubo un problema al enviar el reporte. Inténtalo de nuevo.",
+        tipo: "error",
+      });
     }
   };
 
@@ -232,14 +251,25 @@ function App() {
       await addDoc(collection(db, "sugerencias"), {
         texto: sugerenciaTexto,
         fecha: new Date().toISOString(),
-        dispositivo: navigator.userAgent, 
+        dispositivo: navigator.userAgent,
       });
-      alert("¡Sugerencia enviada! Muchas gracias ❤️");
+      setModalConfig({
+        visible: true,
+        titulo: "¡Recibido!",
+        mensaje:
+          "Tu sugerencia ya está en mis pendientes. ¡Gracias por ayudarme a mejorar Korebulary! ❤️",
+        tipo: "exito",
+      });
       setSugerenciaTexto("");
       setMostrarSugerencias(false);
     } catch (error) {
       console.error("Error al enviar:", error);
-      alert("Hubo un error al enviar. Inténtalo de nuevo.");
+      setModalConfig({
+        visible: true,
+        titulo: "¡Error!",
+        mensaje: "Hubo un error al enviar tu sugerencia. Inténtalo de nuevo.",
+        tipo: "error",
+      });
     } finally {
       setEnviando(false);
     }
@@ -494,12 +524,12 @@ function App() {
                 </div>
 
                 <textarea
-                    value={sugerenciaTexto}
-                    onChange={(e) => setSugerenciaTexto(e.target.value)}
-                    placeholder="Escribe tu sugerencia..."
-                    rows="3"
-                    className="w-full p-3 text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none bg-white text-slate-700"
-                  />
+                  value={sugerenciaTexto}
+                  onChange={(e) => setSugerenciaTexto(e.target.value)}
+                  placeholder="Escribe tu sugerencia..."
+                  rows="3"
+                  className="w-full p-3 text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none bg-white text-slate-700"
+                />
 
                 <button
                   onClick={enviarSugerencia}
@@ -589,6 +619,49 @@ function App() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE ALERTA GENERAL (éxito o error) */}
+      {modalConfig.visible && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-xs bg-white rounded-[2rem] p-6 shadow-2xl text-center animate-in zoom-in duration-300">
+            <div
+              className={`w-30 h-30 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                modalConfig.tipo === "exito" ? "bg-green-100" : "bg-red-100"
+              }`}
+            >
+              <span className="text-3xl">
+                {modalConfig.tipo === "exito" ? (
+                  <img
+                    src={`${process.env.PUBLIC_URL}/img-exito.png`}
+                    alt="Ceci FEliz"
+                    className="w-30 h-30 mx-auto rounded-full shadow-md object-cover"
+                  />
+                ) : (
+                  <img
+                    src={`${process.env.PUBLIC_URL}/img-error.png`}
+                    alt="Ceci Triste"
+                    className="w-30 h-30 mx-auto rounded-full mb-2 shadow-md object-cover"
+                  />
+                )}
+              </span>
+            </div>
+
+            <h3 className="text-lg font-bold text-slate-800 mb-2">
+              {modalConfig.titulo}
+            </h3>
+            <p className="text-sm text-slate-500 mb-6 leading-tight">
+              {modalConfig.mensaje}
+            </p>
+
+            <button
+              onClick={() => setModalConfig({ ...modalConfig, visible: false })}
+              className="w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-sm hover:bg-slate-700 transition-all active:scale-95"
+            >
+              Entendido
+            </button>
           </div>
         </div>
       )}
