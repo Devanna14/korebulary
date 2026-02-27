@@ -262,7 +262,7 @@ function App() {
 
   const FormularioRegistro = (
     <div className="p-6 bg-white rounded-3xl shadow-2xl border border-blue-50 animate-in fade-in zoom-in duration-300">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold text-slate-800">Nueva Tarjeta</h3>
         {vocabulario.length > 0 && (
           <button
@@ -394,7 +394,7 @@ function App() {
             ) : /* 2. SEGUNDA PRIORIDAD: VISTA DE APOYO */
             mostrarApoyo ? (
               <div className="animate-in slide-in-from-right duration-300">
-                <div className="text-center mb-6">
+                <div className="text-center mb-4">
                   <img
                     src={`${process.env.PUBLIC_URL}/img-apoyo.png`}
                     alt="Apoya el proyecto"
@@ -408,7 +408,7 @@ function App() {
                   </p>
                 </div>
 
-                <p className="text-sm text-slate-600 leading-relaxed mb-6 text-center">
+                <p className="text-sm text-slate-600 leading-relaxed mb-4 text-center">
                   안녕하세요! Soy Ceci. Mi meta es mantener esta herramienta
                   <strong> gratuita y libre de anuncios</strong>. Tu
                   contribución me ayuda a pagar los servidores y seguir
@@ -442,7 +442,7 @@ function App() {
             ) : (
               /* 3. VISTA POR DEFECTO: MENÚ DE OPCIONES */
               <>
-                <h2 className="text-2xl font-bold text-slate-800 mb-6">
+                <h2 className="text-2xl font-bold text-slate-800 mb-4">
                   Opciones
                 </h2>
                 <div className="flex flex-col gap-3">
@@ -472,7 +472,7 @@ function App() {
                   </button>
                 </div>
 
-                {/* Sección de Login al final (Opcional, la puedes mantener aquí) */}
+                {/* Sección de Login al final */}
                 <div className="border-t border-slate-100 mt-4 pt-4 text-center">
                   {!usuarioAdmin ? (
                     <button
@@ -516,8 +516,8 @@ function App() {
       <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-100 rounded-full blur-3xl opacity-50"></div>
 
-      <header className="relative z-10 mb-10 text-center">
-        <h1 className="text-5xl font-extrabold text-slate-800 tracking-tight mb-2">
+      <header className="relative z-10 mb-3 text-center">
+        <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight mb-1">
           Kore<span className="text-blue-600">bulary</span>
         </h1>
         <p className="inline-block px-4 py-1 bg-white shadow-sm border border-slate-100 rounded-full text-slate-500 text-sm font-medium">
@@ -529,7 +529,7 @@ function App() {
         </p>
       </header>
 
-      <main className="relative z-10 w-full max-w-md">
+      <main className="relative z-10 w-full max-w-sm">
         {/* Lógica Principal: Si no hay palabras O se activó el form, mostrar Formulario. Si hay palabras, mostrar Flashcard */}
         {vocabulario.length === 0 || mostrarForm ? (
           FormularioRegistro
@@ -540,7 +540,7 @@ function App() {
               card={vocabulario[index]}
               alEscuchar={() => hablarCoreano(vocabulario[index].hangul)}
             />
-            <div className="flex justify-center gap-6 mt-12 w-full">
+            <div className="flex justify-center gap-6 mt-10 w-full">
               <button
                 onClick={anterior}
                 className="group flex items-center justify-center w-14 h-14 bg-white text-slate-600 rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
@@ -564,9 +564,9 @@ function App() {
         )}
       </main>
 
-      <footer className="mt-8 py-2 text-center relative z-10">
+      <footer className="mt-4 py-1 text-center relative z-10">
         <div className="flex flex-col items-center gap-2">
-          <div className="w-24 h-[1px] bg-slate-200 mb-4"></div>
+          <div className="w-24 h-[1px] bg-slate-200 mb-3"></div>
           <p className="text-slate-400 text-sm font-medium tracking-wide">
             © {new Date().getFullYear()}{" "}
             <span className="text-blue-600 font-bold">Korebulary</span>
