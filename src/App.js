@@ -299,7 +299,7 @@ function App() {
       {/* MODAL DEL MENÚ / REPORTE */}
       {mostrarMenu && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl relative overflow-y-auto max-h-[90vh]">
+          <div className="w-full max-w-md bg-white rounded-[2.5rem] p-8 shadow-2xl relative h-fit">
             <button
               onClick={() => {
                 setMostrarMenu(false);
