@@ -377,10 +377,10 @@ function App() {
         {/* Contenedor del Logo con movimiento */}
         <div className="relative z-10 flex flex-col items-center animate-in zoom-in duration-700">
           <div className="relative mb-8">
-            <div className="absolute inset-0 bg-blue-100 rounded-[2.5rem] animate-ping opacity-20"></div>
-            <div className="relative bg-white w-28 h-28 rounded-[2.5rem] shadow-2xl flex items-center justify-center text-6xl animate-bounce border-b-8 border-blue-50">
+            <div className="absolute inset-0 bg-blue-100 rounded-[2.5rem] animate-ping opacity-15"></div>
+            <div className="relative bg-white w-28 h-28 rounded-[2.5rem] flex items-center justify-center text-6xl animate-bounce border-b-8 border-blue-50">
               <img
-                src={`${process.env.PUBLIC_URL}/icon-1.png`}
+                src={`${process.env.PUBLIC_URL}/favicon.ico`}
                 alt="Logo"
                 className="w-28 h-28 rounded-[2.5rem]"
               />
