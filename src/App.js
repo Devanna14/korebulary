@@ -312,7 +312,7 @@ function App() {
   );
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-between p-4 relative overflow-hidden">
       {/* Botón de Engrane */}
       <button
         onClick={() => setMostrarMenu(true)}
