@@ -49,6 +49,9 @@ function App() {
   const provider = new GoogleAuthProvider();
   const [usuarioAdmin, setUsuarioAdmin] = useState(null);
 
+  const [sugerenciaTexto, setSugerenciaTexto] = useState("");
+  const [enviando, setEnviando] = useState(false);
+
   // 1. Datos de Firebase en tiempo real
   useEffect(() => {
     const q = query(collection(db, "vocabulario"));
@@ -218,6 +221,27 @@ function App() {
       setUsuarioAdmin(null);
       setVerReportes(false);
       setMostrarMenu(false);
+    }
+  };
+
+  const enviarSugerencia = async () => {
+    if (!sugerenciaTexto.trim()) return;
+
+    setEnviando(true);
+    try {
+      await addDoc(collection(db, "sugerencias"), {
+        texto: sugerenciaTexto,
+        fecha: new Date().toISOString(),
+        dispositivo: navigator.userAgent, 
+      });
+      alert("¡Sugerencia enviada! Muchas gracias ❤️");
+      setSugerenciaTexto("");
+      setMostrarSugerencias(false);
+    } catch (error) {
+      console.error("Error al enviar:", error);
+      alert("Hubo un error al enviar. Inténtalo de nuevo.");
+    } finally {
+      setEnviando(false);
     }
   };
 
@@ -469,13 +493,25 @@ function App() {
                   </p>
                 </div>
 
-                {/* Botón de acción o contacto */}
-                <a
-                  href="mailto:tu-correo@ejemplo.com"
-                  className="block w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-sm hover:bg-slate-700 transition-colors shadow-lg active:scale-95"
+                <textarea
+                    value={sugerenciaTexto}
+                    onChange={(e) => setSugerenciaTexto(e.target.value)}
+                    placeholder="Escribe tu sugerencia..."
+                    rows="3"
+                    className="w-full p-3 text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none bg-white text-slate-700"
+                  />
+
+                <button
+                  onClick={enviarSugerencia}
+                  disabled={enviando || !sugerenciaTexto.trim()}
+                  className={`block w-full py-3 rounded-xl font-bold text-sm transition-all shadow-md active:scale-95 ${
+                    enviando || !sugerenciaTexto.trim()
+                      ? "bg-slate-300 cursor-not-allowed"
+                      : "bg-slate-800 text-white hover:bg-slate-700"
+                  }`}
                 >
-                  Enviar mi sugerencia
-                </a>
+                  {enviando ? "Enviando..." : "Enviar Sugerencia"}
+                </button>
 
                 <button
                   onClick={() => setMostrarSugerencias(false)}
