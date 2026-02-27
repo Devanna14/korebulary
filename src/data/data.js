@@ -16,3 +16,4 @@ export const opcionesApoyo = [
 ];
 
 export const imagenApoyo = "img-apoyo.png";
+export const imagenSugerencias = process.env.REACT_APP_SUGERENCIAS_IMG || "img-sugerencias.png";

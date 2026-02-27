@@ -36,6 +36,7 @@ function App() {
   const [mostrarFormReporte, setMostrarFormReporte] = useState(false); // Nuevo estado para mostrar el formulario de reporte
 
   const [mostrarApoyo, setMostrarApoyo] = useState(false);
+  const [sugerencias, setMostrarSugerencias] = useState(false);
 
   const [reporte, setReporte] = useState({
     hangul: "",
@@ -330,6 +331,7 @@ function App() {
                 setMostrarMenu(false);
                 setMostrarFormReporte(false);
                 setMostrarApoyo(false);
+                setMostrarSugerencias(false);
               }}
               className="absolute top-6 right-6 text-slate-300 hover:text-slate-500 text-3xl"
             >
@@ -439,6 +441,49 @@ function App() {
                   ))}
                 </div>
               </div>
+            ) : /* 3. TERCERA PRIORIDAD: VISTA DE SUGERENCIAS */
+            sugerencias ? (
+              <div className="animate-in fade-in zoom-in duration-300 text-center">
+                <div className="mb-4">
+                  <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                    <img
+                      src={`${process.env.PUBLIC_URL}/img-sugerencias.png`}
+                      alt="Sugerencias del proyecto"
+                      className="w-35 h-35 mx-auto rounded-full mb-2 shadow-md object-cover"
+                    />
+                  </div>
+                  <h2 className="text-xl font-bold text-slate-800">
+                    Sugerencias
+                  </h2>
+                  <p className="text-blue-600 font-medium text-xs">
+                    Korebulary
+                  </p>
+                </div>
+
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-6">
+                  <p className="text-[13px] text-slate-600 leading-relaxed">
+                    ¿Tienes alguna idea para mejorar la app o encontraste algún
+                    error? Me encantaría escucharte para seguir haciendo de{" "}
+                    <strong>Korebulary </strong> la mejor herramienta para
+                    aprender coreano.
+                  </p>
+                </div>
+
+                {/* Botón de acción o contacto */}
+                <a
+                  href="mailto:tu-correo@ejemplo.com"
+                  className="block w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-sm hover:bg-slate-700 transition-colors shadow-lg active:scale-95"
+                >
+                  Enviar mi sugerencia
+                </a>
+
+                <button
+                  onClick={() => setMostrarSugerencias(false)}
+                  className="mt-4 text-slate-400 text-xs font-bold w-full text-center hover:text-slate-600 transition-colors uppercase tracking-wider"
+                >
+                  ← Volver al inicio
+                </button>
+              </div>
             ) : (
               /* 3. VISTA POR DEFECTO: MENÚ DE OPCIONES */
               <>
@@ -459,7 +504,7 @@ function App() {
                     <span>📧</span> Contacto
                   </a>
                   <button
-                    onClick={() => alert("¡Gracias!")} // O tu botón de sugerencias
+                    onClick={() => setMostrarSugerencias(true)}
                     className="flex items-center gap-4 p-4 bg-slate-50 hover:bg-yellow-50 text-slate-600 hover:text-yellow-600 rounded-2xl transition-colors font-medium text-left"
                   >
                     <span>💡</span> Sugerencias
