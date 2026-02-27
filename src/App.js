@@ -474,9 +474,9 @@ function App() {
       {/* Botón de Engrane */}
       <button
         onClick={() => setMostrarMenu(true)}
-        className="absolute top-6 right-6 z-50 p-3 bg-white rounded-full shadow-md hover:shadow-lg transition-all text-slate-400 hover:text-blue-600 active:scale-90"
+        className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 p-2 sm:p-3 bg-white rounded-full shadow-md hover:shadow-lg transition-all text-slate-400 hover:text-blue-600 active:scale-90"
       >
-        <span className="text-2xl">⚙️</span>
+        <span className="text-lg sm:text-2xl">⚙️</span>
       </button>
 
       {/* MODAL DEL MENÚ / REPORTE */}
@@ -773,8 +773,8 @@ function App() {
       <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-100 rounded-full blur-3xl opacity-50"></div>
 
-      <header className="relative z-10 mb-3 text-center">
-        <h1 className="text-5xl font-extrabold text-slate-800 tracking-tight mb-1">
+      <header className="relative z-10 mb-2 text-center">
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-800 tracking-tight mb-4">
           Kore<span className="text-blue-600">bulary</span>
         </h1>
         <p className="inline-block px-4 py-1 bg-white shadow-sm border border-slate-100 rounded-full text-slate-500 text-sm font-medium">
