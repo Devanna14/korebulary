@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/korebulary/static/css/main.5d581a8c.css",
-    "main.js": "/korebulary/static/js/main.2f51b1cc.js",
+    "main.css": "/korebulary/static/css/main.3c0c0acc.css",
+    "main.js": "/korebulary/static/js/main.5bca25a5.js",
     "static/js/453.f4be7151.chunk.js": "/korebulary/static/js/453.f4be7151.chunk.js",
     "index.html": "/korebulary/index.html",
-    "main.5d581a8c.css.map": "/korebulary/static/css/main.5d581a8c.css.map",
-    "main.2f51b1cc.js.map": "/korebulary/static/js/main.2f51b1cc.js.map",
+    "main.3c0c0acc.css.map": "/korebulary/static/css/main.3c0c0acc.css.map",
+    "main.5bca25a5.js.map": "/korebulary/static/js/main.5bca25a5.js.map",
     "453.f4be7151.chunk.js.map": "/korebulary/static/js/453.f4be7151.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.5d581a8c.css",
-    "static/js/main.2f51b1cc.js"
+    "static/css/main.3c0c0acc.css",
+    "static/js/main.5bca25a5.js"
   ]
 }
