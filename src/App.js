@@ -62,6 +62,8 @@ function App() {
     tipo: "exito",
   });
 
+  const [minimoTiempoCumplido, setMinimoTiempoCumplido] = useState(false); // Nuevo estado para controlar el tiempo minimo del loader
+
   // 1. Datos de Firebase en tiempo real
   useEffect(() => {
     const q = query(collection(db, "vocabulario"));
@@ -178,7 +180,8 @@ function App() {
         titulo: "¡Recibido!",
         mensaje:
           "Reporte enviado con éxito. Revisaré la palabra '" +
-          hangulLimpio + "' pronto. ¡Gracias por ayudarme a mejorar Korebulary! ❤️",
+          hangulLimpio +
+          "' pronto. ¡Gracias por ayudarme a mejorar Korebulary! ❤️",
         tipo: "exito",
       });
 
@@ -197,8 +200,7 @@ function App() {
       setModalConfig({
         visible: true,
         titulo: "¡Error!",
-        mensaje:
-          "Hubo un problema al enviar el reporte. Inténtalo de nuevo.",
+        mensaje: "Hubo un problema al enviar el reporte. Inténtalo de nuevo.",
         tipo: "error",
       });
     }
@@ -305,12 +307,113 @@ function App() {
   };
 
   // Validación de que haya datos antes de renderizar la Flashcard
-  if (cargando) {
+  // if (cargando) {
+  //   return (
+  //     <div className="h-[100dvh] flex flex-col items-center justify-center bg-[#f8fafc] p-6 text-center">
+  //       {/* Contenedor del Icono Animado */}
+  //       <div className="relative mb-8">
+  //         {/* Círculo de fondo con pulso */}
+  //         <div className="absolute inset-0 bg-blue-100 rounded-full animate-ping opacity-25"></div>
+
+  //         {/* Emoji o Icono principal con rebote */}
+  //         <div className="relative bg-white w-24 h-24 rounded-full shadow-xl flex items-center justify-center text-5xl animate-bounce border-4 border-blue-50">
+  //           ✨
+  //         </div>
+  //       </div>
+
+  //       {/* Texto de Carga */}
+  //       <h2 className="text-2xl font-black text-slate-800 mb-2 tracking-tight">
+  //         Kore<span className="text-blue-600">bulary</span>
+  //       </h2>
+
+  //       <div className="flex items-center gap-2">
+  //         <p className="text-sm font-bold text-slate-400 uppercase tracking-widest animate-pulse">
+  //           Cargando vocabulario
+  //         </p>
+  //         {/* Tres puntitos animados */}
+  //         <span className="flex gap-1">
+  //           <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+  //           <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+  //           <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce"></span>
+  //         </span>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinimoTiempoCumplido(true);
+    }, 4500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Solo deja de cargar cuando Firebase terminó Y pasó el tiempo mínimo
+  const mostrarLoader = cargando || !minimoTiempoCumplido;
+
+  if (mostrarLoader) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f8fafc]">
-        <p className="text-xl font-medium text-slate-600 animate-pulse">
-          Conectando con Korebulary...
-        </p>
+      <div className="h-[100dvh] flex flex-col items-center justify-center bg-[#f8fafc] overflow-hidden relative">
+        {/* Letras Coreanas Flotantes de Fondo */}
+        <div className="absolute inset-0 pointer-events-none opacity-25">
+          <span className="absolute top-1/4 left-1/4 animate-bounce text-4xl text-dark-50 [animation-delay:0.2s]">
+            안녕하세요
+          </span>
+          <span className="absolute top-1/2 right-10 animate-pulse text-6xl text-dark-50">
+            ㄱ
+          </span>
+          <span className="absolute bottom-1/4 left-10 animate-bounce text-5xl text-dark-50 [animation-delay:0.5s]">
+            ㅎ
+          </span>
+          <span className="absolute top-10 right-1/4 animate-pulse text-4xl text-dark-50">
+            사랑
+          </span>
+          <span className="absolute bottom-10 right-1/3 animate-bounce text-5xl text-dark-50">
+            한국
+          </span>
+        </div>
+
+        {/* Contenedor del Logo con movimiento */}
+        <div className="relative z-10 flex flex-col items-center animate-in zoom-in duration-700">
+          <div className="relative mb-8">
+            <div className="absolute inset-0 bg-blue-100 rounded-[2.5rem] animate-ping opacity-20"></div>
+            <div className="relative bg-white w-28 h-28 rounded-[2.5rem] shadow-2xl flex items-center justify-center text-6xl animate-bounce border-b-8 border-blue-50">
+              <img
+                src={`${process.env.PUBLIC_URL}/logo192.png`}
+                alt="Logo"
+                className="w-28 h-28 rounded-[2.5rem]"
+              />
+            </div>
+          </div>
+
+          {/* Nombre de la App con animación escalonada */}
+          <div className="flex gap-1 mb-3">
+            {["K", "o", "r", "e", "b", "u", "l", "a", "r", "y"].map(
+              (letra, i) => (
+                <span
+                  key={i}
+                  className="text-3xl font-black text-slate-800 animate-bounce text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600"
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
+                  {letra}
+                </span>
+              ),
+            )}
+          </div>
+
+          {/* Subtítulo */}
+          <div className="flex items-center gap-2">
+            <p className="text-xs font-bold text-blue-600/60 uppercase tracking-[0.4em] animate-pulse">
+              Preparando tarjetas
+            </p>
+            <span className="flex gap-1">
+              <span className="w-1 h-1 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+              <span className="w-1 h-1 bg-blue-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+              <span className="w-1 h-1 bg-blue-400 rounded-full animate-bounce"></span>
+            </span>
+          </div>
+        </div>
       </div>
     );
   }
@@ -671,7 +774,7 @@ function App() {
       <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-100 rounded-full blur-3xl opacity-50"></div>
 
       <header className="relative z-10 mb-3 text-center">
-        <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight mb-1">
+        <h1 className="text-5xl font-extrabold text-slate-800 tracking-tight mb-1">
           Kore<span className="text-blue-600">bulary</span>
         </h1>
         <p className="inline-block px-4 py-1 bg-white shadow-sm border border-slate-100 rounded-full text-slate-500 text-sm font-medium">
