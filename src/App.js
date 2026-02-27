@@ -356,7 +356,7 @@ function App() {
     return (
       <div className="h-[100dvh] flex flex-col items-center justify-center bg-[#f8fafc] overflow-hidden relative">
         {/* Letras Coreanas Flotantes de Fondo */}
-        <div className="absolute inset-0 pointer-events-none opacity-25">
+        <div className="absolute inset-0 pointer-events-none opacity-15">
           <span className="absolute top-1/4 left-1/4 animate-bounce text-4xl text-dark-50 [animation-delay:0.2s]">
             안녕하세요
           </span>
@@ -380,7 +380,7 @@ function App() {
             <div className="absolute inset-0 bg-blue-100 rounded-[2.5rem] animate-ping opacity-20"></div>
             <div className="relative bg-white w-28 h-28 rounded-[2.5rem] shadow-2xl flex items-center justify-center text-6xl animate-bounce border-b-8 border-blue-50">
               <img
-                src={`${process.env.PUBLIC_URL}/logo192.png`}
+                src={`${process.env.PUBLIC_URL}/icon-1.png`}
                 alt="Logo"
                 className="w-28 h-28 rounded-[2.5rem]"
               />
