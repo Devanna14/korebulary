@@ -24,8 +24,15 @@ function App() {
   const [verReportes, setVerReportes] = useState(false);
   const [vocabulario, setVocabulario] = useState([]); // Inicializamos vacío, luego se llenará con Firebase
   const [vocabularioFiltrado, setVocabularioFiltrado] = useState([]); // Para manejar el recorte y mezcla
-  const [cantidadEstudio, setCantidadEstudio] = useState(10); // Estado para la cantidad elegida
-  const [index, setIndex] = useState(0);
+  const [cantidadEstudio, setCantidadEstudio] = useState(() => {
+    const guardado = localStorage.getItem("korebulary_cantidad");
+    return guardado ? Number(guardado) : 10;
+  });
+
+  const [index, setIndex] = useState(() => {
+    const guardado = localStorage.getItem("korebulary_index");
+    return guardado ? Number(guardado) : 0;
+  });
   const [nuevaPalabra, setNuevaPalabra] = useState({
     hangul: "",
     significado: "",
@@ -79,23 +86,67 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  // Nuevo: Efecto para mezclar y recortar la lista cuando cambia el vocabulario original o la cantidad
+  // Guardar el índice cada vez que cambie
+  useEffect(() => {
+    localStorage.setItem("korebulary_index", index.toString());
+  }, [index]);
+
+  // 1. Efecto cuando el vocabulario carga o cambia la cantidad
   useEffect(() => {
     if (vocabulario.length > 0) {
-      const mezcladas = [...vocabulario]
-        .sort(() => Math.random() - 0.5)
-        .slice(0, cantidadEstudio);
-      setVocabularioFiltrado(mezcladas);
-      setIndex(0); // Reiniciamos al principio si cambia la configuración
+      const guardadas = localStorage.getItem("korebulary_lista_actual");
+      // Lo que hay en LocalStorage
+      let listaExistente = [];
+      try {
+        listaExistente = guardadas ? JSON.parse(guardadas) : [];
+      } catch (e) {
+        console.error("Error al leer la lista local", e);
+      }
+      // Solo cambian las palabras si NO hay lista guardada O si la longitud es diferente a la cantidad actual (10, 25, 50, 100)
+      if (
+        listaExistente.length > 0 &&
+        listaExistente.length === cantidadEstudio
+      ) {
+        // Si ya existe y coincide con la cantidad (10, 25, 50, 100) se respeta
+        setVocabularioFiltrado(listaExistente);
+      } else {
+        // Nueva lista
+        const mezcladas = [...vocabulario]
+          .sort(() => Math.random() - 0.5)
+          .slice(0, cantidadEstudio);
+
+        setVocabularioFiltrado(mezcladas);
+        localStorage.setItem(
+          "korebulary_lista_actual",
+          JSON.stringify(mezcladas),
+        );
+        // Al ser una lista nueva, forzamos el inicio en la tarjeta 0
+        setIndex(0);
+        localStorage.setItem("korebulary_index", "0");
+      }
     }
-  }, [vocabulario, cantidadEstudio]);
+  }, [vocabulario.length > 0, cantidadEstudio]);
+
+  // 2. Función de cambio de cantidad optimizada
+  const cambiarCantidad = (num) => {
+    setCantidadEstudio(num);
+    localStorage.setItem("korebulary_cantidad", num.toString());
+    localStorage.removeItem("korebulary_lista_actual");
+
+    setIndex(0);
+    localStorage.setItem("korebulary_index", "0");
+    setMostrarMenu(false);
+  };
 
   const siguiente = () => {
     setIndex((prev) => (prev + 1) % vocabularioFiltrado.length);
   };
 
   const anterior = () => {
-    setIndex((prev) => (prev - 1 + vocabularioFiltrado.length) % vocabularioFiltrado.length);
+    setIndex(
+      (prev) =>
+        (prev - 1 + vocabularioFiltrado.length) % vocabularioFiltrado.length,
+    );
   };
 
   // 2. Guardar en Firebase
@@ -618,23 +669,20 @@ function App() {
                 {/* NUEVA SECCIÓN: CANTIDAD DE PALABRAS */}
                 <div className="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
-                    Cantidad de estudio
+                    Meta de estudio
                   </label>
-                  <div className="flex gap-2 justify-between">
+                  <div className="grid grid-cols-2 gap-2">
                     {[10, 25, 50, 100].map((num) => (
                       <button
                         key={num}
-                        onClick={() => {
-                          setCantidadEstudio(num);
-                          setMostrarMenu(false);
-                        }}
-                        className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${
+                        onClick={() => cambiarCantidad(num)}
+                        className={`py-2 rounded-xl text-sm font-bold transition-all ${
                           cantidadEstudio === num
                             ? "bg-blue-600 text-white shadow-md"
-                            : "bg-white text-slate-500 border border-slate-200 hover:border-blue-300"
+                            : "bg-white text-slate-500 border border-slate-200"
                         }`}
                       >
-                        {num}
+                        {num} palabras
                       </button>
                     ))}
                   </div>
@@ -776,7 +824,9 @@ function App() {
             <Flashcard
               key={vocabularioFiltrado[index].id}
               card={vocabularioFiltrado[index]}
-              alEscuchar={() => hablarCoreano(vocabularioFiltrado[index].hangul)}
+              alEscuchar={() =>
+                hablarCoreano(vocabularioFiltrado[index].hangul)
+              }
             />
             <div className="flex justify-center gap-6 mt-10 w-full">
               <button
