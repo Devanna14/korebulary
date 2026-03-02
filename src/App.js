@@ -22,8 +22,9 @@ import {
 
 function App() {
   const [verReportes, setVerReportes] = useState(false);
-  // const [vocabulario, setVocabulario] = useState(vocabularioCoreano); // Inicializamos con datos locales para pruebas, luego se actualizará con Firebase
   const [vocabulario, setVocabulario] = useState([]); // Inicializamos vacío, luego se llenará con Firebase
+  const [vocabularioFiltrado, setVocabularioFiltrado] = useState([]); // Para manejar el recorte y mezcla
+  const [cantidadEstudio, setCantidadEstudio] = useState(10); // Estado para la cantidad elegida
   const [index, setIndex] = useState(0);
   const [nuevaPalabra, setNuevaPalabra] = useState({
     hangul: "",
@@ -78,12 +79,23 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  // Nuevo: Efecto para mezclar y recortar la lista cuando cambia el vocabulario original o la cantidad
+  useEffect(() => {
+    if (vocabulario.length > 0) {
+      const mezcladas = [...vocabulario]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, cantidadEstudio);
+      setVocabularioFiltrado(mezcladas);
+      setIndex(0); // Reiniciamos al principio si cambia la configuración
+    }
+  }, [vocabulario, cantidadEstudio]);
+
   const siguiente = () => {
-    setIndex((prev) => (prev + 1) % vocabulario.length);
+    setIndex((prev) => (prev + 1) % vocabularioFiltrado.length);
   };
 
   const anterior = () => {
-    setIndex((prev) => (prev - 1 + vocabulario.length) % vocabulario.length);
+    setIndex((prev) => (prev - 1 + vocabularioFiltrado.length) % vocabularioFiltrado.length);
   };
 
   // 2. Guardar en Firebase
@@ -143,27 +155,6 @@ function App() {
 
     try {
       const reporteRef = doc(db, "reportes", idReporte);
-      //COMENTADO POR ERROR DE LECTURA EN USUARIOS GENERALES, SE DEBE VERIFICAR SI EL REPORTE EXISTE PARA EVITAR DUPLICADOS, PERO ESTÁ GENERANDO UN ERROR DE LECTURA EN FIREBASE QUE NO PERMITE ENVIAR REPORTES NUEVOS
-      // Verificamos si el reporte ya existe en la base de datos
-      // const docSnap = await getDoc(reporteRef);
-      // if (docSnap.exists()) {
-      //   alert(
-      //     `La palabra "${hangulLimpio}" ya tiene un reporte activo y está siendo revisada. ¡Gracias por tu paciencia!`,
-      //   );
-
-      //   setReporte({
-      //     hangul: "",
-      //     comentario: "",
-      //     fecha: null,
-      //     estado: "pendiente",
-      //     correo: "",
-      //     userAgent: "",
-      //   });
-      //   setMostrarFormReporte(false);
-      //   setMostrarMenu(false);
-      //   return;
-      // }
-
       // Si no existe, se crearlo
       await setDoc(reporteRef, {
         ...reporte,
@@ -213,7 +204,6 @@ function App() {
         setUsuarioAdmin(user);
       } else if (user) {
         // Si entra alguien más con Google, lo deslogueamos o limitamos
-        console.log("Acceso denegado: No es administrador");
         signOut(auth);
       }
     });
@@ -305,41 +295,6 @@ function App() {
 
     window.speechSynthesis.speak(enunciado);
   };
-
-  // Validación de que haya datos antes de renderizar la Flashcard
-  // if (cargando) {
-  //   return (
-  //     <div className="h-[100dvh] flex flex-col items-center justify-center bg-[#f8fafc] p-6 text-center">
-  //       {/* Contenedor del Icono Animado */}
-  //       <div className="relative mb-8">
-  //         {/* Círculo de fondo con pulso */}
-  //         <div className="absolute inset-0 bg-blue-100 rounded-full animate-ping opacity-25"></div>
-
-  //         {/* Emoji o Icono principal con rebote */}
-  //         <div className="relative bg-white w-24 h-24 rounded-full shadow-xl flex items-center justify-center text-5xl animate-bounce border-4 border-blue-50">
-  //           ✨
-  //         </div>
-  //       </div>
-
-  //       {/* Texto de Carga */}
-  //       <h2 className="text-2xl font-black text-slate-800 mb-2 tracking-tight">
-  //         Kore<span className="text-blue-600">bulary</span>
-  //       </h2>
-
-  //       <div className="flex items-center gap-2">
-  //         <p className="text-sm font-bold text-slate-400 uppercase tracking-widest animate-pulse">
-  //           Cargando vocabulario
-  //         </p>
-  //         {/* Tres puntitos animados */}
-  //         <span className="flex gap-1">
-  //           <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-  //           <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-  //           <span className="w-1 h-1 bg-blue-600 rounded-full animate-bounce"></span>
-  //         </span>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -659,6 +614,32 @@ function App() {
                 <h2 className="text-2xl font-bold text-slate-800 mb-4">
                   Opciones
                 </h2>
+
+                {/* NUEVA SECCIÓN: CANTIDAD DE PALABRAS */}
+                <div className="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+                    Cantidad de estudio
+                  </label>
+                  <div className="flex gap-2 justify-between">
+                    {[10, 25, 50, 100].map((num) => (
+                      <button
+                        key={num}
+                        onClick={() => {
+                          setCantidadEstudio(num);
+                          setMostrarMenu(false);
+                        }}
+                        className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${
+                          cantidadEstudio === num
+                            ? "bg-blue-600 text-white shadow-md"
+                            : "bg-white text-slate-500 border border-slate-200 hover:border-blue-300"
+                        }`}
+                      >
+                        {num}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="flex flex-col gap-3">
                   <button
                     onClick={() => setMostrarFormReporte(true)}
@@ -778,24 +759,24 @@ function App() {
           Kore<span className="text-blue-600">bulary</span>
         </h1>
         <p className="inline-block px-4 py-1 bg-white shadow-sm border border-slate-100 rounded-full text-slate-500 text-sm font-medium">
-          {vocabulario.length === 0
+          {vocabularioFiltrado.length === 0
             ? "¡Bienvenido! Registra tu primera palabra"
             : mostrarForm
               ? "Agregando palabra"
-              : `Tarjeta ${index + 1} de ${vocabulario.length}`}
+              : `Tarjeta ${index + 1} de ${vocabularioFiltrado.length}`}
         </p>
       </header>
 
       <main className="relative z-10 w-full max-w-sm">
         {/* Lógica Principal: Si no hay palabras O se activó el form, mostrar Formulario. Si hay palabras, mostrar Flashcard */}
-        {vocabulario.length === 0 || mostrarForm ? (
+        {vocabularioFiltrado.length === 0 || mostrarForm ? (
           FormularioRegistro
         ) : (
           <>
             <Flashcard
-              key={vocabulario[index].id}
-              card={vocabulario[index]}
-              alEscuchar={() => hablarCoreano(vocabulario[index].hangul)}
+              key={vocabularioFiltrado[index].id}
+              card={vocabularioFiltrado[index]}
+              alEscuchar={() => hablarCoreano(vocabularioFiltrado[index].hangul)}
             />
             <div className="flex justify-center gap-6 mt-10 w-full">
               <button
@@ -842,129 +823,6 @@ function App() {
       {verReportes && <AdminPanel alCerrar={() => setVerReportes(false)} />}
     </div>
   );
-
-  // return (
-  //   <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-6 relative overflow-hidden">
-  //     <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50"></div>
-  //     <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-100 rounded-full blur-3xl opacity-50"></div>
-
-  //     <header className="relative z-10 mb-10 text-center">
-  //       <h1 className="text-5xl font-extrabold text-slate-800 tracking-tight mb-2">
-  //         Kore<span className="text-blue-600">bulary</span>
-  //       </h1>
-  //       <p className="inline-block px-4 py-1 bg-white shadow-sm border border-slate-100 rounded-full text-slate-500 text-sm font-medium">
-  //         {mostrarForm
-  //           ? "Agregando palabra"
-  //           : `Tarjeta ${index + 1} de ${vocabulario.length}`}
-  //       </p>
-  //     </header>
-
-  //     <main className="relative z-10 w-full max-w-md">
-  //       {!mostrarForm ? (
-  //         <>
-  //           <Flashcard key={vocabulario[index].id} card={vocabulario[index]} />
-
-  //           <div className="flex justify-center gap-6 mt-12 w-full">
-  //             <button
-  //               onClick={anterior}
-  //               className="group flex items-center justify-center w-14 h-14 bg-white text-slate-600 rounded-2xl shadow-lg hover:shadow-xl transition-all active:scale-95"
-  //             >
-  //               <span className="text-2xl">←</span>
-  //             </button>
-
-  //             <button
-  //               onClick={siguiente}
-  //               className="group flex items-center justify-center px-10 h-14 bg-slate-900 text-white rounded-2xl shadow-xl hover:bg-slate-800 transition-all active:scale-95 font-bold tracking-wide"
-  //             >
-  //               Siguiente →
-  //             </button>
-
-  //             <button
-  //               onClick={() => setMostrarForm(true)}
-  //               className="w-14 h-14 bg-blue-600 text-white rounded-2xl shadow-lg hover:bg-blue-700 transition-all active:scale-95 flex items-center justify-center text-2xl font-bold"
-  //             >
-  //               +
-  //             </button>
-  //           </div>
-  //         </>
-  //       ) : (
-  //         <div className="p-6 bg-white rounded-3xl shadow-2xl border border-blue-50 animate-in fade-in zoom-in duration-300">
-  //           <div className="flex justify-between items-center mb-6">
-  //             <h3 className="text-xl font-bold text-slate-800">
-  //               Nueva Tarjeta
-  //             </h3>
-  //             <button
-  //               onClick={() => setMostrarForm(false)}
-  //               className="text-slate-400 hover:text-slate-600 text-2xl"
-  //             >
-  //               ×
-  //             </button>
-  //           </div>
-  //           <form onSubmit={agregarPalabra} className="flex flex-col gap-4">
-  //             <input
-  //               type="text"
-  //               placeholder="Hangul (ej: 친구)"
-  //               className="p-4 border border-slate-100 bg-slate-50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-  //               value={nuevaPalabra.hangul}
-  //               onChange={(e) =>
-  //                 setNuevaPalabra({ ...nuevaPalabra, hangul: e.target.value })
-  //               }
-  //             />
-  //             <input
-  //               type="text"
-  //               placeholder="Romanización (ej: Chingu)"
-  //               className="p-4 border border-slate-100 bg-slate-50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-  //               value={nuevaPalabra.romanizacion}
-  //               onChange={(e) =>
-  //                 setNuevaPalabra({
-  //                   ...nuevaPalabra,
-  //                   romanizacion: e.target.value,
-  //                 })
-  //               }
-  //             />
-  //             <input
-  //               type="text"
-  //               placeholder="Significado (ej: Amigo)"
-  //               className="p-4 border border-slate-100 bg-slate-50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-  //               value={nuevaPalabra.significado}
-  //               onChange={(e) =>
-  //                 setNuevaPalabra({
-  //                   ...nuevaPalabra,
-  //                   significado: e.target.value,
-  //                 })
-  //               }
-  //             />
-  //             <button
-  //               type="submit"
-  //               className="mt-4 bg-blue-600 text-white p-4 rounded-2xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95"
-  //             >
-  //               Guardar
-  //             </button>
-  //           </form>
-  //         </div>
-  //       )}
-  //     </main>
-
-  //     <footer className="mt-8 py-2 text-center relative z-10">
-  //       <div className="flex flex-col items-center gap-2">
-  //         <div className="w-24 h-[1px] bg-slate-200 mb-4"></div>
-  //         <p className="text-slate-400 text-sm font-medium tracking-wide">
-  //           © {new Date().getFullYear()}{" "}
-  //           <span className="text-blue-600 font-bold">Korebulary</span>
-  //         </p>
-  //         <p className="text-slate-300 text-xs">
-  //           Desarrollado con <span className="text-red-400">♥</span> by{" "}
-  //           <a
-  //             href="https://github.com/Devanna14"
-  //             className="text-blue-500 hover:underline"
-  //           >
-  //             Ceci Lara
-  //           </a>
-  //         </p>
-  //       </div>
-  //     </footer>
-  //   </div>
-  // );
 }
 
 export default App;
