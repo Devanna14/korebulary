@@ -72,6 +72,18 @@ function App() {
 
   const [minimoTiempoCumplido, setMinimoTiempoCumplido] = useState(false); // Nuevo estado para controlar el tiempo minimo del loader
 
+  // Mini tutorial de bienvenida solo la primera vez que entra el usuario a la app se guarda en localStorage
+  const [mostrarTutorial, setMostrarTutorial] = useState(() => {
+    const yaVisto = localStorage.getItem("korebulary_tutorial_visto");
+    return yaVisto ? false : true; // Si no existe, es la primera vez
+  });
+
+  // Función para cerrar el tutorial y marcarlo como visto en localStorage
+  const cerrarTutorial = () => {
+    setMostrarTutorial(false);
+    localStorage.setItem("korebulary_tutorial_visto", "true");
+  };
+
   // 1. Datos de Firebase en tiempo real
   useEffect(() => {
     const q = query(collection(db, "vocabulario"));
@@ -846,6 +858,62 @@ function App() {
           </>
         )}
       </main>
+
+      {mostrarTutorial && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-blue-950/55 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="max-w-xs text-center text-white">
+            <div className="text-6xl mb-1 animate-bounce">
+              <img
+                src={`${process.env.PUBLIC_URL}/img-apoyo.png`}
+                alt="Bienvenida"
+                className="w-20 h-20 mx-auto rounded-full mb-2 shadow-md object-cover"
+              />
+            </div>
+            <h2 className="text-3xl font-black mb-4">
+              ¡Bienvenidos a Kore<span className="text-blue-950">bulary</span>!
+            </h2>
+
+            <div className="space-y-6 text-left mb-8">
+              <div className="flex gap-4 items-start">
+                <span className="bg-white/20 p-2 rounded-lg">📓</span>
+                <p className="text-sm">
+                  Estudia con <strong>tarjetas interactivas</strong> para
+                  memorizar rápido.
+                </p>
+              </div>
+              <div className="flex gap-4 items-start">
+                <span className="bg-white/20 p-2 rounded-lg">⚙️</span>
+                <p className="text-sm">
+                  En el <strong>engrane</strong> puedes elegir si estudiar 10,
+                  25, 50 o 100 palabras.
+                </p>
+              </div>
+              <div className="flex gap-4 items-start">
+                <span className="bg-white/20 p-2 rounded-lg">💾</span>
+                <p className="text-sm">
+                    Puedes cerrar la app siempre guardamos tu progreso. Cuando vuelvas, seguirás justo donde lo dejaste.
+                </p>
+              </div>
+              <div className="flex gap-4 items-start">
+                <span className="bg-white/20 p-2 rounded-lg">🫰</span>
+                <p className="text-sm">
+                  <strong>Korebulary</strong> es una herramienta independiente
+                  gratuita y sin anuncios, si quieres apoyar el proyecto,
+                  encontrarás opciones en el menú de engrane. ¡Gracias por ser
+                  parte de esta aventura de aprendizaje! ❤️ 감사합니다
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={cerrarTutorial}
+              className="w-full py-4 bg-white text-blue-950 rounded-2xl font-bold shadow-xl active:scale-95 transition-transform"
+            >
+              ¡Empezar a aprender!
+            </button>
+          </div>
+        </div>
+      )}
 
       <footer className="mt-4 py-1 text-center relative z-10">
         <div className="flex flex-col items-center gap-2">
