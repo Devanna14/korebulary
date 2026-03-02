@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">korebulary</string>
+    <string name="title_activity_main">korebulary</string>
+    <string name="package_name">com.korebularyjoapps.app</string>
+    <string name="custom_url_scheme">com.korebularyjoapps.app</string>
+</resources>
