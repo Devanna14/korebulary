@@ -95,22 +95,18 @@ function App() {
   useEffect(() => {
     if (vocabulario.length > 0) {
       const guardadas = localStorage.getItem("korebulary_lista_actual");
-      // Lo que hay en LocalStorage
       let listaExistente = [];
       try {
         listaExistente = guardadas ? JSON.parse(guardadas) : [];
       } catch (e) {
-        console.error("Error al leer la lista local", e);
+        console.error(e);
       }
-      // Solo cambian las palabras si NO hay lista guardada O si la longitud es diferente a la cantidad actual (10, 25, 50, 100)
-      if (
-        listaExistente.length > 0 &&
-        listaExistente.length === cantidadEstudio
-      ) {
-        // Si ya existe y coincide con la cantidad (10, 25, 50, 100) se respeta
+      // Sin pide cierta cantidad y no hay suficientes toma la cantidad máxima disponible para no generar un array vacío
+      const objetivoReal = Math.min(cantidadEstudio, vocabulario.length);
+
+      if (listaExistente.length > 0 && listaExistente.length === objetivoReal) {
         setVocabularioFiltrado(listaExistente);
       } else {
-        // Nueva lista
         const mezcladas = [...vocabulario]
           .sort(() => Math.random() - 0.5)
           .slice(0, cantidadEstudio);
@@ -120,12 +116,11 @@ function App() {
           "korebulary_lista_actual",
           JSON.stringify(mezcladas),
         );
-        // Al ser una lista nueva, forzamos el inicio en la tarjeta 0
         setIndex(0);
         localStorage.setItem("korebulary_index", "0");
       }
     }
-  }, [vocabulario.length > 0, cantidadEstudio]);
+  }, [vocabulario.length, cantidadEstudio]);
 
   // 2. Función de cambio de cantidad optimizada
   const cambiarCantidad = (num) => {
