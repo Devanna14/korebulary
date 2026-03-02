@@ -484,7 +484,7 @@ function App() {
 
   return (
     <div className="h-[100dvh] bg-[#f8fafc] flex flex-col items-center justify-between p-4 relative overflow-hidden">
-      {/* Botón de Engrane */}
+      {/* Botón de opciones */}
       <button
         onClick={() => setMostrarMenu(true)}
         className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 p-2 sm:p-3 bg-white rounded-full shadow-md hover:shadow-lg transition-all text-slate-400 hover:text-blue-600 active:scale-90"
@@ -884,7 +884,7 @@ function App() {
               <div className="flex gap-4 items-start">
                 <span className="bg-white/20 p-2 rounded-lg">⚙️</span>
                 <p className="text-sm">
-                  En el <strong>engrane</strong> puedes elegir si estudiar 10,
+                  En las <strong>opciones</strong> puedes elegir si estudiar 10,
                   25, 50 o 100 palabras.
                 </p>
               </div>
@@ -899,7 +899,7 @@ function App() {
                 <p className="text-sm">
                   <strong>Korebulary</strong> es una herramienta independiente
                   gratuita y sin anuncios, si quieres apoyar el proyecto,
-                  encontrarás opciones en el menú de engrane. ¡Gracias por ser
+                  encontrarás opciones en el menú. ¡Gracias por ser
                   parte de esta aventura de aprendizaje! ❤️ 감사합니다
                 </p>
               </div>
