@@ -177,9 +177,13 @@ function App() {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        alert(
-          `La palabra "${hangulLimpio.hangul}" ya fue registrada por alguien más.`,
-        );
+        setModalConfig({
+        visible: true,
+        titulo: "¡Recibido!",
+        mensaje:
+          `La palabra "${hangulLimpio}" ya fue registrada por alguien más en Korebulary, intenta otra`,
+        tipo: "exito",
+      });
         return;
       }
 
@@ -196,7 +200,13 @@ function App() {
       setMostrarForm(false);
     } catch (error) {
       console.error("Error en la operación:", error);
-      alert("Hubo un error al intentar guardar.");
+      setModalConfig({
+        visible: true,
+        titulo: "¡Error!",
+        mensaje:
+          "Hubo un error al intentar guardar la palabra, intenta de nuevo o contacta al administrador.",
+        tipo: "error",
+      });
     }
   };
 
